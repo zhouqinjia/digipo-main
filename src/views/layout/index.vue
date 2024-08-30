@@ -9,11 +9,7 @@
           </div>
           <template #dropdown>
             <el-dropdown-menu>
-<<<<<<< HEAD
-              <el-dropdown-item>Logout</el-dropdown-item>
-=======
               <el-dropdown-item @click="logout">Logout </el-dropdown-item>
->>>>>>> 513e1d26d9447c30dd9153ed937ad7591a8c91e9
             </el-dropdown-menu>
           </template>
         </el-dropdown>
