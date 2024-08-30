@@ -9,7 +9,7 @@
           </div>
           <template #dropdown>
             <el-dropdown-menu>
-              <el-dropdown-item>Logout </el-dropdown-item>
+              <el-dropdown-item @click="logout">Logout </el-dropdown-item>
             </el-dropdown-menu>
           </template>
         </el-dropdown>
@@ -40,6 +40,19 @@
 </template>
 
 <script setup>
+import supabase from '../../utils/supabase.js'
+import { ElMessage } from 'element-plus'
+import { getCurrentInstance } from 'vue'
+
+const vm = getCurrentInstance()?.proxy
+const logout = async () => {
+  await supabase.auth.signOut()
+  vm.$router.push('/login')
+  ElMessage({
+    message: 'Logout success.',
+    type: 'success'
+  })
+}
 </script>
 <style lang="scss" scoped>
   .common-layout, .el-container {
