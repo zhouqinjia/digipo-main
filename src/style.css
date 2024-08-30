@@ -3,7 +3,8 @@ body {
   width: 100vw;
   height: 100vh;
   background-color: #f7fbff;
-  overflow-x: hidden;
+  overflow: hidden;
+  font-size: 14px;
 }
 #app {
   height: 100%;
