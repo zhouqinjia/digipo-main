@@ -1,12 +1,12 @@
 <template>
   <el-container>
     <el-header>
-      <h2>Pending Tasks(Core)</h2>
+      <h2>Pending Tasks(Supplier)</h2>
     </el-header>
 
     <el-main>
       <el-tabs v-model="activeTab">
-        <el-tab-pane label="Digipo Issuance" name="digipo-issuance">
+        <el-tab-pane label="Transaction Review" name="transaction-review">
           <div v-loading="loading" style="margin-top: 20px;">
             <el-table :data="dataListOne">
               <el-table-column
@@ -43,7 +43,7 @@
               <!-- 添加操作列 -->
               <el-table-column label="Action">
                 <template v-slot="scope">
-                  <el-button type="primary" @click="openDialog(scope.row)">Issue Digipo</el-button>
+                  <el-button type="primary" @click="toReview(scope.row)">Review</el-button>
                 </template>
               </el-table-column>
             </el-table>
@@ -52,23 +52,10 @@
         <el-tab-pane disabled label="Digipo Settlement" name="digipo-settlement">
 
         </el-tab-pane>
-        <el-tab-pane disabled label="Transaction Review" name="transaction-review">
+        <el-tab-pane disabled label="Digipo Issuance" name="digipo-issuance">
 
         </el-tab-pane>
       </el-tabs>
-      <!-- 添加对话框 -->
-      <el-dialog
-        title="Issue Digipo"
-        v-model="dialogVisible"
-        width="30%"
-        @close="dialogVisible = false"
-      >
-        <span>Confirm to Issue Digipo?</span>
-        <template #footer>
-          <el-button @click="dialogVisible = false">Cancel</el-button>
-          <el-button type="primary" @click="handleConfirm">Confirm</el-button>
-        </template>
-      </el-dialog>
     </el-main>
   </el-container>
 </template>
@@ -80,20 +67,10 @@ export default {
     return {
       loading:false,
       dialogVisible:false,
-      activeTab: "digipo-issuance",
+      activeTab: "transaction-review",
       digipoIssuanceList: [], // 准备数据源
       digipoSettlementList: [], // 准备数据源
       transactionReviewList: [], // 准备数据源
-      colNameList:{
-        'Account Payable No':'',
-        'Supplier':'',
-        'Buyer':'',
-        'Functional Department':'',
-        'Currency':'',
-        'Accounts Payable Amount':'',
-        'Digipo Maturity Date':'',
-        'Acceptance Date':''
-      },
       dataListOne:[],
       curId:''
     };
@@ -108,7 +85,7 @@ export default {
         let { data, error } = await supabase
           .from('dg_asset')
           .select('*')
-          .eq("status","issued")
+          .eq("status","assign")
         if(!error) {
           this.dataListOne = data
         }  
@@ -117,10 +94,13 @@ export default {
       }
            
     },
-    openDialog(row) {
-      this.dialogVisible = true;
-      this.curId = row.id
-      this.currentRow = row;
+    toReview(row) {
+      this.$router.push({
+        path: "/supplierReview",
+        query:{
+          id:row.id
+        }
+      })
     },
     async handleConfirm() {
       // 变更状态

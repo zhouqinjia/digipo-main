@@ -9,7 +9,7 @@
           </div>
           <template #dropdown>
             <el-dropdown-menu>
-              <el-dropdown-item>Logout </el-dropdown-item>
+              <el-dropdown-item>Logout</el-dropdown-item>
             </el-dropdown-menu>
           </template>
         </el-dropdown>
@@ -21,13 +21,17 @@
             class="el-menu-vertical-demo"
             :router="true"
           >
-            <el-menu-item index="/home">
-              <el-icon><document /></el-icon>
-              <span>home</span>
-            </el-menu-item>
             <el-menu-item index="/issueDigipo">
               <el-icon><document /></el-icon>
               <span>Issue Digipo</span>
+            </el-menu-item>
+            <el-menu-item index="/home">
+              <el-icon><document /></el-icon>
+              <span>Core Home</span>
+            </el-menu-item>
+            <el-menu-item index="/supplierHome">
+              <el-icon><document /></el-icon>
+              <span>Supplier Home</span>
             </el-menu-item>
             </el-menu>
         </el-aside>
@@ -40,6 +44,19 @@
 </template>
 
 <script setup>
+import { onMounted } from "vue"
+import { useRoute,useRouter } from "vue-router"
+const route = useRoute()
+const router = useRouter()
+onMounted(()=>{
+  initRouter()
+})
+const initRouter = ()=>{
+  const { path } = route
+  if(path){
+    router.push(path)
+  }
+}
 </script>
 <style lang="scss" scoped>
   .common-layout, .el-container {

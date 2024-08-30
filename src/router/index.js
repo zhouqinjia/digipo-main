@@ -11,10 +11,20 @@ const routes = [
         component: () => import("../views/home/index.vue"),
       },
       {
+        path: '/supplierHome',
+        name: 'supplierHome',
+        component: () => import("../views/supplierHome/index.vue"),
+      },
+      {
         path: '/issueDigipo',
         name: 'issueDigipo',
         component: () => import("../views/issueDigipo/index.vue"),
       },
+      {
+        path:'/supplierReview',
+        name:'supplierReview',
+        component:()=>import("@/views/supplierHome/review/index.vue")
+      }
     ]
   },
 ]
