@@ -4,56 +4,177 @@
       <el-icon @click="goBack"><ArrowLeft /></el-icon>
       <h2 style="margin-left: 20px; font-weight: bold;">Review</h2>
     </el-header>
-
-    <el-main>
-      <div class="info-header">
-        <h3 class="title">Invoice Information</h3>
-        <el-button type="primary">Add</el-button>
-      </div>
-      <el-table :data="invoiceList" style="margin-top: 20px;">
-        <el-table-column type="index" label="No." width="50" />
-        <el-table-column prop="invoiceNo" label="Invoice No." />
-        <el-table-column prop="invoiceCode" label="Invoice Code" />
-        <el-table-column prop="currency" label="Currency" />
-        <el-table-column prop="invoiceAmount" label="Invoice Amount" />
-        <el-table-column prop="excludingTaxAmount" label="Excluding Tax Amount" />
-        <el-table-column prop="buyer" label="Buyer" />
-        <el-table-column prop="supplier" label="Supplier" />
-        <el-table-column prop="invoiceType" label="Invoice Type" />
-        <el-table-column prop="verificationMethod" label="Verification Method" />
-        <el-table-column prop="verificationResult" label="Verification Result" />
-        <el-table-column prop="invoiceIssuanceDate" label="Invoice Issuance Date" />
-      </el-table>
-    </el-main>
+    <div v-loading="loading">
+      <el-main>
+        <div class="info-header">
+          <h3 class="title">Invoice Information</h3>
+          <el-button type="primary" @click="openAddInvoiceDialog">Add Invoice</el-button>
+        </div>
+        <el-table :data="invoiceList" style="margin-top: 20px;">
+          <el-table-column type="index" label="No." width="50" />
+          <el-table-column prop="invoice_no" label="Invoice No." />
+          <el-table-column prop="currency" label="Currency" />
+          <el-table-column prop="invoice_amount" label="Invoice Amount" />
+          <el-table-column prop="buyer_name" label="Buyer" />
+          <el-table-column prop="supplier_name" label="Supplier" />
+          <el-table-column prop="invoice_type" label="Invoice Type" />
+          <el-table-column prop="issuance_date" label="Invoice Issuance Date" >
+            <template v-slot="{ row }">
+              {{ row.issuance_date.slice(0,10) }}
+            </template>
+          </el-table-column>
+        </el-table>
+      </el-main>
+    </div>
+    
   </el-container>
+  <el-dialog
+    title="Add Invoice"
+    v-model="addInvoiceDialogVisible"
+    width="40%"
+    @close="addInvoiceDialogVisible = false"
+  >
+    <div class="form">
+      <el-form ref="addInvoiceForm" :model="addInvoiceFormData">
+        <el-form-item label="Invoice Type">
+          <el-input v-model="addInvoiceFormData.invoice_type"></el-input>
+        </el-form-item>
+        <el-form-item label="Invoice No">
+          <el-input v-model="addInvoiceFormData.invoice_no"></el-input>
+        </el-form-item>
+        <el-form-item label="Invoice Issuance Date">
+          <el-date-picker
+            style="width:300px"
+            v-model="addInvoiceFormData.issuance_date"
+            type="date"
+            placeholder="Pick a date"
+          ></el-date-picker>
+        </el-form-item>
+        <el-form-item label="Supplier">
+          <el-select style="width: 300px" v-model="addInvoiceFormData.supplier_name" placeholder="Please select">
+            <el-option
+              v-for="item in suppliers"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value"
+            ></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="Buyer">
+          <el-select style="width: 300px" v-model="addInvoiceFormData.buyer_name" placeholder="Please select">
+            <el-option
+              v-for="item in buyers"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value"
+            ></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="Currency">
+          <el-input v-model="addInvoiceFormData.currency"></el-input>
+        </el-form-item>
+        <el-form-item label="Invoice Amount">
+          <el-input v-model="addInvoiceFormData.invoice_amount"></el-input>
+        </el-form-item>
+      </el-form>
+    
+    </div>
+    <template #footer>
+      <el-button @click="addInvoiceDialogVisible = false">Cancel</el-button>
+      <el-button type="primary" @click="submitInvoice">Submit</el-button>
+    </template>
+  </el-dialog>
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import { useRouter } from "vue-router"
+import { ref,onMounted } from 'vue'
+import { useRouter,useRoute } from "vue-router"
+import supabase from '@/utils/supabase.js'
 const router = useRouter()
-const invoiceList = ref([
-  // 示例数据
-  {
-    invoiceNo: 'INV-001',
-    invoiceCode: 'CODE-001',
-    currency: 'USD',
-    invoiceAmount: '1000',
-    excludingTaxAmount: '800',
-    buyer: 'Buyer 1',
-    supplier: 'Supplier 1',
-    invoiceType: 'Standard',
-    verificationMethod: 'Manual',
-    verificationResult: 'Verified',
-    invoiceIssuanceDate: '2023-01-01'
-  },
-  // 更多数据...
-]);
-
-function goBack() {
-  router.go(-1)
+const route = useRoute()
+const invoiceList = ref([]);
+const addInvoiceDialogVisible = ref(false)
+const addInvoiceFormData = ref({
+  invoice_type: '',
+  invoice_no: '',
+  issuance_date: '',
+  supplier_name: '',
+  buyer_name: '',
+  currency: '',
+  invoice_amount: '',
+  supplier_id:'',
+  buyer_id:''
+})
+const loading = ref(false)
+const suppliers = ref([])
+const buyers = ref([])
+onMounted(async ()=>{
+  getInvoiceListBySupplierId()
+  getBuyerEnum()
+  getSupplierEnum()
+})
+const getInvoiceListBySupplierId = async ()=>{
+  try {
+    if(!route.query.id) return
+    loading.value = true
+    let { data: dg_invoices, error } = await supabase
+      .from('dg_invoice')
+      .select('*')
+      .eq("supplier_id",route.query.id)
+    if (!error) {
+      invoiceList.value = dg_invoices
+    }   
+  } finally {
+    loading.value = false
+  }
+   
+}
+const getBuyerEnum = async () => {
+  let { data: dg_buyer, error } = await supabase
+  .from('dg_buyer')
+  .select('*')
+  if (!error) {
+    buyers.value = dg_buyer.map(item=>({ 
+      value:item.name,
+      label:item.name,
+      id:item.id
+    }))
+  }    
 }
 
+const getSupplierEnum = async () => {
+  let { data: dg_supplier, error } = await supabase
+  .from('dg_supplier')
+  .select('*')
+  if (!error) {
+    suppliers.value = dg_supplier.map(item=>({ 
+      value:item.name,
+      label:item.name,
+      id:item.id
+    }))
+  }    
+}
+const goBack = ()=>{
+  router.go(-1)
+}
+const openAddInvoiceDialog = ()=>{
+  addInvoiceDialogVisible.value = true
+}
+const submitInvoice = async () => {
+  try {
+    addInvoiceFormData.value.supplier_id = suppliers.value.find(s=>s.value === addInvoiceFormData.value.supplier_name).id || ''
+    addInvoiceFormData.value.buyer_id = buyers.value.find(b=>b.value === addInvoiceFormData.value.buyer_name).id || ''
+    let { data: dg_invoices, error } = await supabase
+    .from('dg_invoice')
+    .insert([addInvoiceFormData.value])
+    .select()
+  } catch (error) {
+    console.log(error)
+  } finally {
+    addInvoiceDialogVisible.value = false
+    getInvoiceListBySupplierId()
+  }
+};
 function handleAction(row) {
   console.log('Action clicked for row:', row);
 }
@@ -73,4 +194,31 @@ function handleAction(row) {
   align-items: center;
   justify-content: space-between;
 }
+.form {
+  display:flex;
+  justify-content:center;
+  align-items:center;
+}
+.el-form {
+  display: flex;
+  flex-wrap: wrap;
+  .el-form-item {
+    display:flex;
+    flex-direction: column;
+    align-items:flex-start;
+    flex: 0 0 48%;
+    margin-right: 0px;
+    :deep(.el-date-editor.el-input) {
+      width: 100% !important;
+    }
+    :deep(.el-input__wrapper) {
+      width:278px !important;
+    }
+    .el-input {
+      width:300px
+    }
+  }
+}
+
+  
 </style>
