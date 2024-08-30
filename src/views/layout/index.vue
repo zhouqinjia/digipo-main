@@ -9,7 +9,11 @@
           </div>
           <template #dropdown>
             <el-dropdown-menu>
+<<<<<<< HEAD
               <el-dropdown-item>Logout</el-dropdown-item>
+=======
+              <el-dropdown-item @click="logout">Logout </el-dropdown-item>
+>>>>>>> 513e1d26d9447c30dd9153ed937ad7591a8c91e9
             </el-dropdown-menu>
           </template>
         </el-dropdown>
@@ -46,6 +50,9 @@
 <script setup>
 import { onMounted } from "vue"
 import { useRoute,useRouter } from "vue-router"
+import supabase from '../../utils/supabase.js'
+import { ElMessage } from 'element-plus'
+import { getCurrentInstance } from 'vue'
 const route = useRoute()
 const router = useRouter()
 onMounted(()=>{
@@ -56,6 +63,16 @@ const initRouter = ()=>{
   if(path){
     router.push(path)
   }
+}
+
+const vm = getCurrentInstance()?.proxy
+const logout = async () => {
+  await supabase.auth.signOut()
+  vm.$router.push('/login')
+  ElMessage({
+    message: 'Logout success.',
+    type: 'success'
+  })
 }
 </script>
 <style lang="scss" scoped>
