@@ -8,8 +8,8 @@
     </div>
     <div class="search-area">
     </div>
-    <el-table :data="tableData" style="width: 98%; margin-top: 24px;">
-      <el-table-column type="selection" width="55" />
+    <el-table :data="tableData" style="width: 98%; margin-top: 24px;" v-loading="loading">
+      <!-- <el-table-column type="selection" width="55" /> -->
       <el-table-column type="index" width="50" label="No."/>
       <!-- <el-table-column prop="date" label="Accounts Payable No." width="180" />
       <el-table-column prop="name" label="Transaction Reference" width="180" /> -->
@@ -31,6 +31,18 @@
       <el-table-column width="300" prop="underlying_transaction_contract_name" label="Underlying Transaction Contract Name" />
       <el-table-column width="300" prop="underlying_transaction_contract_no" label="Underlying Transaction Contract No." />
       <el-table-column width="300" prop="account_payable_maturity_date" label="Underlying Transaction Date" />
+      <el-table-column fixed="right" label="Operations" min-width="120">
+        <template #default="scope">
+          <el-button
+            text
+            type="primary"
+            size="small"
+            @click.prevent="deleteAsset(scope.row)"
+          >
+            Delete
+          </el-button>
+        </template>
+      </el-table-column>
     </el-table>
 
     <el-dialog v-model="showModel" width="700">
@@ -50,49 +62,71 @@
             label-position="top"
           >
             <el-form-item label="Supplier" prop="name">
-              <el-input v-model="formData.supplier" />
+              <el-select
+                v-model="supplierObj"
+                placeholder="Select"
+              >
+                <el-option
+                  v-for="item in supplierEnum"
+                  :key="item.id"
+                  :label="item.name"
+                  :value="item"
+                />
+              </el-select>
+              <!-- <el-input v-model="formData.supplier" placeholder="Enter"/> -->
             </el-form-item>
             <el-form-item label="Buyer" prop="name">
-              <el-input v-model="formData.buyer" />
+              <el-select
+                v-model="buyerObj"
+                placeholder="Select"
+              >
+                <el-option
+                  v-for="item in buyerEnum"
+                  :key="item.id"
+                  :label="item.name"
+                  :value="item"
+                />
+              </el-select>
+              <!-- <el-input v-model="formData.buyer" /> -->
             </el-form-item>
             <el-form-item label="Payment by Affiliate" prop="resource">
               <el-radio-group v-model="formData.payment_by_affilliate">
-                <el-radio :value="false">NO</el-radio>
-                <el-radio :value="true">YES</el-radio>
+                <el-radio :value="false">No</el-radio>
+                <el-radio :value="true">Yes</el-radio>
               </el-radio-group>
             </el-form-item>
             <el-form-item label="Currency" prop="region">
-              <el-select v-model="formData.currency" placeholder="Activity zone">
+              <el-select v-model="formData.currency" placeholder="Select">
                 <el-option v-for="item in currencyEnum" :key="item" :label="item" :value="item" />
               </el-select>
             </el-form-item>
             <el-form-item label="Accounts Payable Amount" prop="name">
-              <el-input v-model="formData.account_payable_amount" />
+              <el-input v-model="formData.account_payable_amount" placeholder="Enter"/>
             </el-form-item>
             <el-form-item label="Accounts Payable Maturity Date">
               <el-date-picker
                 v-model="formData.account_payable_maturity_date"
                 type="date"
-                placeholder="Pick a date"
+                placeholder="Select"
                 clearable
                 format="YYYY-MM-DD"
-                value-format="x"
+                value-format="YYYY/MM/DD"
               />
             </el-form-item>
             <el-form-item label="Underlying Transaction Contract Name" prop="name">
-              <el-input v-model="formData.underlying_transaction_contract_name" />
+              <el-input v-model="formData.underlying_transaction_contract_name" placeholder="Enter"/>
             </el-form-item>
             <el-form-item label="Underlying Transaction Contract No." prop="name">
-              <el-input v-model="formData.underlying_transaction_contract_no" />
+              <el-input v-model="formData.underlying_transaction_contract_no" placeholder="Enter"/>
             </el-form-item>
             <el-form-item label="Signing Date of Basic Transaction Contract">
               <el-date-picker
                 v-model="formData.sign_date"
                 type="date"
-                placeholder="Pick a date"
+                placeholder="Select"
                 clearable
                 format="YYYY-MM-DD"
-                value-format="x"
+                value-format="YYYY/MM/DD"
               />
             </el-form-item>
           </el-form>
@@ -108,21 +142,29 @@
 
 <script setup>
 import { ref } from 'vue'
+import { ElMessage } from 'element-plus'
 import supabase from '../../utils/supabase.js'
 const origin = {
+  supplier_id: '',
+  buyer_id: '',
   supplier: '',
   buyer: '',
-  payment_by_affilliate: '',
+  payment_by_affilliate: null,
   currency: '',
-  account_payable_amount: '',
-  account_payable_maturity_date: '',
+  account_payable_amount: null,
+  account_payable_maturity_date: null,
   underlying_transaction_contract_name: '',
   underlying_transaction_contract_no: '',
-  sign_date: '',
+  sign_date: null,
 }
 const tableData = ref([])
+const loading = ref(false)
 const currencyEnum = ref(['CNY', 'USD', 'JPY', 'GBP', 'EUR', 'AUD', 'CAD', 'NZD', 'SGD', 'CHF', 'MYR', 'THB', 'HKD', 'CNH', 'SEK', 'DKK', 'NOK', 'MXN', 'VND', 'BRL', 'PHP', 'COP', 'CLP', 'TWD', 'IDR', 'PKR', 'BDT', 'AED'])
+const buyerEnum = ref([])
+const supplierEnum = ref([])
 const showModel = ref(false)
+const supplierObj = ref(null)
+const buyerObj = ref(null)
 const formData = ref({
   ...origin
 })
@@ -136,24 +178,72 @@ const closeModel = () => {
   }
   showModel.value = false
 }
-const getTableData = async () => {
+
+const getBuyerEnum = async () => {
   
+  let { data: dg_buyer, error } = await supabase
+  .from('dg_buyer')
+  .select('*')
+  if (!error) {
+    buyerEnum.value = dg_buyer
+  }    
+}
+
+const getSupplierEnum = async () => {
+  
+  let { data: dg_supplier, error } = await supabase
+  .from('dg_supplier')
+  .select('*')
+  if (!error) {
+    supplierEnum.value = dg_supplier
+  }    
+}
+
+const getTableData = async () => {
+  loading.value = true
   let { data, error } = await supabase
   .from('dg_asset')
   .select('*')
   if(!error) {
     tableData.value = data
+    loading.value = false
   }
           
 }
 const submitData = async () => {
   const { data, err } = await supabase.from('dg_asset').insert([{
     ...formData.value,
-    account_payable_amount: formData.value.account_payable_amount*1
+    account_payable_amount: formData.value.account_payable_amount*1,
+    supplier_id: supplierObj.value?.id,
+    supplier: supplierObj.value?.name,
+    buyer_id: buyerObj.value?.id,
+    buyer: buyerObj.value?.name,
   }])
+  if (!err) {
+    ElMessage({
+      message: 'Add Success.',
+      type: 'success'
+    })
+    closeModel()
+    getTableData()
+  }
 }
-
+const deleteAsset = async (row) => {
+  const { error } = await supabase
+  .from('dg_asset')
+  .delete()
+  .eq('id', row.id)
+  if (!error) {
+    ElMessage({
+      message: 'Delete Success.',
+      type: 'success'
+    })
+    getTableData()
+  }  
+}
 getTableData()
+getBuyerEnum()
+getSupplierEnum()
 </script>
 
 <style lang="sass" scoped>
