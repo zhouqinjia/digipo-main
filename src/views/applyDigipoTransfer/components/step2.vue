@@ -1,5 +1,8 @@
 <template>
   <div>
+    <div class="contract-info">
+      
+    </div>
     <div class="invoice-info">
       <div class="label-area">
         <span class="label">Invoice Information</span>
@@ -10,17 +13,17 @@
       <div class="table-area">
         <el-table :data="tableData" style="width: 98%; margin-top: 24px;">
           <el-table-column type="index" width="50" label="No."/>
-          <el-table-column width="180" prop="digiop_no" label="Invoice No." />
-          <el-table-column width="180" prop="account_receivable" label="Invoice Code" />
-          <el-table-column width="180" prop="financing_agent" label="Currency" />
+          <el-table-column width="180" prop="nvoice_no" label="Invoice No." />
+          <el-table-column width="180" prop="invoice_code" label="Invoice Code" />
+          <el-table-column width="180" prop="currency" label="Currency" />
           <el-table-column width="180" prop="tier_of_digipo_transfer" label="Invoice Amount" />
-          <el-table-column width="180" prop="buyer" label="Excluding Tax Amount" />
-          <el-table-column width="180" prop="currency" label="Buyer" />
-          <el-table-column width="300" prop="account_payable_amount" label="Supplier" />
-          <el-table-column width="300" prop="account_payable_maturity_date" label="Invoice Type" />
-          <el-table-column width="300" prop="underlying_transaction_contract_name" label="Verification Method" />
-          <el-table-column width="300" prop="underlying_transaction_contract_no" label="Verification Result" />
-          <el-table-column width="300" prop="account_payable_maturity_date" label="Invoice Issuance Date" />
+          <el-table-column width="250" prop="excluding_tax_amount" label="Excluding Tax Amount" />
+          <el-table-column width="180" prop="buyer" label="Buyer" />
+          <el-table-column width="300" prop="supplier" label="Supplier" />
+          <el-table-column width="300" prop="invoice_type" label="Invoice Type" />
+          <el-table-column width="300" prop="verification_method" label="Verification Method" />
+          <el-table-column width="300" prop="verification_result" label="Verification Result" />
+          <el-table-column width="300" prop="invoice_issuance_date" label="Invoice Issuance Date" />
         </el-table>
       </div>
     </div>
@@ -88,10 +91,16 @@
         </div>
       </div>
     </el-dialog>
+    <div class="footer">
+      <el-button @click="back">Back</el-button>
+      <el-button @click="back">Previous</el-button>
+      <el-button type="primary" @click="next">Confirm Transfer</el-button>
+    </div>
   </div>
 </template>
 <script setup>
 import { ref } from 'vue'
+import { ElMessage } from 'element-plus'
 const tableData = ref([])
 const showModel = ref(false)
 const formData = ref({
@@ -114,6 +123,21 @@ const showInvoiceModel = () => {
 }
 const closeModel = () => {}
 const submitData = () => {}
+const emit = defineEmits(['sendNextStep'])
+const back = () => {
+  emit('sendNextStep', 1)
+}
+const next = () => {
+  if (tableData.value.length === 0) {
+    ElMessage({
+      message: 'Invoice information of the current digipo must be filled and cannot be empty.',
+      type: 'error'
+    })
+  } else {
+    // 调接口 通过跳转下一步
+    emit('sendNextStep', 3)
+  }
+}
 </script>
 <style lang="sass" scoped>
 .invoice-info {
@@ -156,6 +180,21 @@ const submitData = () => {}
   }
   .footer {
     text-align: center;
+  }
+}
+.footer {
+  width: 100%;
+  position: absolute;
+  bottom: 16px;
+  left: 0px;
+  text-align: center;
+  box-shadow: 0px -5px 5px 0px rgba(46, 90, 153, 0.1);
+  height: 64px;
+  box-sizing: border-box;
+  padding-top: 12px;
+  background-color: #fff;
+  .el-button {
+    padding: 8px 23px;
   }
 }
 </style>

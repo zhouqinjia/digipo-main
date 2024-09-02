@@ -26,6 +26,7 @@
             plain
             type="primary"
             size="small"
+            v-if="scope.row.status === 'acknowledge'"
             @click="transfer(scope.row)"
           >
             Transfer

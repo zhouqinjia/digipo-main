@@ -1,3 +1,3 @@
 <template>
-  <div>step4</div>
+  <div>Complete</div>
 </template>

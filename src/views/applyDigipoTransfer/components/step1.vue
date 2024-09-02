@@ -43,8 +43,8 @@
               placeholder="Enter"
             />
           </el-form-item>
-          <el-form-item label="Digipo Recipient" prop="region">
-            <el-select v-model="formData.currency" placeholder="Select">
+          <el-form-item label="Digipo Recipient" prop="digipo_Recipient">
+            <el-select v-model="formData.digipo_Recipient" placeholder="Select">
               <el-option
                 v-for="item in digipoRecipientEnum"
                 :key="item"
@@ -111,15 +111,37 @@
         </div>
       </div>
     </div>
+    <div class="footer">
+      <el-button @click="back">Back</el-button>
+      <el-button type="primary" @click="next(formDataRef)">Next</el-button>
+    </div>
   </div>
 </template>
 <script setup>
 import { ref } from 'vue'
-const formData = {
-
-} 
+import { useRouter } from "vue-router"
+const router = useRouter()
+const formData = ref({
+  digipo_Recipient: null
+})
+const rules = ref({
+  digipo_Recipient: [{ required: true, message: 'Please Select', trigger: 'blur' }],
+})
+const formDataRef = ref(null)
 const digipoRecipientEnum = ref([])
+const emit = defineEmits(['sendNextStep'])
 const currencyEnum = ref(['CNY', 'USD', 'JPY', 'GBP', 'EUR', 'AUD', 'CAD', 'NZD', 'SGD', 'CHF', 'MYR', 'THB', 'HKD', 'CNH', 'SEK', 'DKK', 'NOK', 'MXN', 'VND', 'BRL', 'PHP', 'COP', 'CLP', 'TWD', 'IDR', 'PKR', 'BDT', 'AED'])
+const back = () => {
+  router.push('/applyDigipoTransfer')
+}
+const next = (formEl) => {
+  if (!formEl) return
+  formEl.validate(async (valid) => {
+    if (valid) {
+      emit('sendNextStep', 2)
+    }
+  })
+}
 </script>
 <style lang="sass" scoped>
 .step1 {
@@ -186,6 +208,22 @@ const currencyEnum = ref(['CNY', 'USD', 'JPY', 'GBP', 'EUR', 'AUD', 'CAD', 'NZD'
       color: #333;
       font-weight: bold;
     }
+  }
+}
+
+.footer {
+  width: 100%;
+  position: absolute;
+  bottom: 16px;
+  left: 0px;
+  text-align: center;
+  box-shadow: 0px -5px 5px 0px rgba(46, 90, 153, 0.1);
+  height: 64px;
+  box-sizing: border-box;
+  padding-top: 12px;
+  background-color: #fff;
+  .el-button {
+    padding: 8px 23px;
   }
 }
 </style>
