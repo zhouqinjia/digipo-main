@@ -84,8 +84,9 @@
   </div>
 </template>
 <script setup>
-import { useRouter } from "vue-router"
+import { useRouter,useRoute } from "vue-router"
 import { ref } from 'vue';
+import supabase from "@/utils/supabase";
 const emit = defineEmits(['sendNextStep'])
 const tableList = ref([
   {
@@ -94,9 +95,16 @@ const tableList = ref([
   },
 ]);
 const router = useRouter()
+const route = useRoute()
 const isCheck = ref(false)
-const next = () => {
-  emit('sendNextStep', 4)
+const next = async () => {
+  const { data,error } = await supabase
+    .from("dg_asset")
+    .update({status:"completed"})
+    .eq("id",route.query.id)
+  if(!error){
+    emit('sendNextStep', 4)
+  }
 }
 const goBack = () => {
   emit('sendNextStep', 2)
@@ -105,6 +113,7 @@ const goBack = () => {
 <style lang="scss" scoped>
 .step3 {
   display: flex;
+  justify-content: center;
   .left-table {
     width: 50%;
     padding: 20px;
@@ -121,6 +130,7 @@ const goBack = () => {
         }
       }
       .bottom-table {
+
         .row-bottom {
           border: 1px solid #b6beca;
           border-bottom: 0;

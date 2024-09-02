@@ -43,7 +43,7 @@
               placeholder="Enter"
             />
           </el-form-item>
-          <!-- <el-form-item label="Digipo Recipient" prop="digipo_Recipient">
+          <el-form-item label="Digipo Recipient" prop="digipo_Recipient">
             <el-select v-model="formData.digipo_Recipient" placeholder="Select">
               <el-option
                 v-for="item in digipoRecipientEnum"
@@ -52,7 +52,7 @@
                 :value="item"
               />
             </el-select>
-          </el-form-item> -->
+          </el-form-item>
           <el-form-item label="Digipo Assignment Purpose">
             <el-input
               v-model="textarea2"
@@ -119,7 +119,7 @@ const formData = ref({
   digipo_Recipient: null
 })
 const rules = ref({
-  digipo_Recipient: [{ required: true, message: 'Please Select', trigger: 'blur' }],
+  // digipo_Recipient: [{ required: true, message: 'Please Select', trigger: 'blur' }],
 })
 const formDataRef = ref(null)
 // const digipoRecipientEnum = ref([])

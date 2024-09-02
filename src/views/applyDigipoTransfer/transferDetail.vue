@@ -38,7 +38,7 @@ const setSupplierId = (val)=>{
   curSupplierId.value = val
 }
 </script>
-<style lang="sass" scoped>
+<style lang="scss" scoped>
 .tranfer-detail {
   height: 100%;
   overflow: hidden;
