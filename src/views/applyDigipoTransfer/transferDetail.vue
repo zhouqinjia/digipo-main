@@ -6,22 +6,18 @@
     <div class="page-content">
       <div class="step-progress">
         <el-steps style="max-width: 1980px" :active="activeStep" align-center>
-          <el-step  description="Confirm Digipo Information" />
-          <el-step  description="Trade Documents for Digipo Transfer" />
-          <el-step  description="Contract Signing" />
-          <el-step  description="Complete" />
+          <el-step  ref="ref1" description="Confirm Digipo Information" />
+          <el-step  ref="ref2" description="Trade Documents for Digipo Transfer" />
+          <el-step  ref="ref3" description="Contract Signing" />
+          <el-step  ref="ref4" description="Complete" />
         </el-steps>
       </div>
       <div class="step-area">
-        <step1 v-if="activeStep === 1"/>
-        <step2 v-if="activeStep === 2"/>
-        <step3 v-if="activeStep === 3"/>
+        <step1 v-if="activeStep === 1" @sendNextStep="getStep"/>
+        <step2 v-if="activeStep === 2" @sendNextStep="getStep"/>
+        <step3 v-if="activeStep === 3" @sendNextStep="getStep"/>
         <step4 v-if="activeStep === 4"/>
       </div>
-    </div>
-    <div class="footer">
-      <el-button @click="back">Back</el-button>
-      <el-button type="primary" @click="next">Next</el-button>
     </div>
   </div>
 </template>
@@ -33,18 +29,9 @@ import step2 from './components/step2'
 import step3 from './components/step3'
 import step4 from './components/step4'
 const router = useRouter()
-const activeStep = ref(2)
-const next = () => {
-  if (activeStep.value < 4) {
-    activeStep.value = activeStep.value + 1
-  }
-}
-const back = () => {
-  if (activeStep.value === 1) {
-    router.push('/applyDigipoTransfer')
-  } else {
-    activeStep.value = activeStep.value - 1
-  }
+const activeStep = ref(1)
+const getStep = (step) => {
+  activeStep.value = step
 }
 </script>
 <style lang="sass" scoped>
@@ -70,7 +57,7 @@ const back = () => {
   height: calc(100% - 80px);
   overflow-y:auto; 
 }
-  .step-progress {
+  :deep(.step-progress) {
     margin-top: 50px;
     .el-step__main {
       margin-top: 16px;
@@ -78,25 +65,11 @@ const back = () => {
     }
     .el-step__description.is-finish {
       color: #000;
+      font-weight: 600;
     }
   }
   .step-area {
     margin-top: 20px;
     padding-bottom: 20px;
-  }
-  .footer {
-    width: 100%;
-    position: absolute;
-    bottom: 16px;
-    left: 0px;
-    text-align: center;
-    box-shadow: 0px -5px 5px 0px rgba(46, 90, 153, 0.1);
-    height: 64px;
-    box-sizing: border-box;
-    padding-top: 12px;
-    background-color: #fff;
-    .el-button {
-      padding: 8px 23px;
-    }
   }
 </style>
