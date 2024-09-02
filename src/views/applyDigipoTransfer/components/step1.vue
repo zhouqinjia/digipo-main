@@ -121,7 +121,7 @@ const formData = {
 const digipoRecipientEnum = ref([])
 const currencyEnum = ref(['CNY', 'USD', 'JPY', 'GBP', 'EUR', 'AUD', 'CAD', 'NZD', 'SGD', 'CHF', 'MYR', 'THB', 'HKD', 'CNH', 'SEK', 'DKK', 'NOK', 'MXN', 'VND', 'BRL', 'PHP', 'COP', 'CLP', 'TWD', 'IDR', 'PKR', 'BDT', 'AED'])
 </script>
-<style lang="sass">
+<style lang="sass" scoped>
 .step1 {
   height: 100%;
   overflow: auto;  

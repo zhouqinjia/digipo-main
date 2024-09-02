@@ -33,7 +33,7 @@ import step2 from './components/step2'
 import step3 from './components/step3'
 import step4 from './components/step4'
 const router = useRouter()
-const activeStep = ref(1)
+const activeStep = ref(2)
 const next = () => {
   if (activeStep.value < 4) {
     activeStep.value = activeStep.value + 1
@@ -47,7 +47,7 @@ const back = () => {
   }
 }
 </script>
-<style lang="sass">
+<style lang="sass" scoped>
 .tranfer-detail {
   height: 100%;
   overflow: hidden;
