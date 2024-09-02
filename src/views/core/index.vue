@@ -10,6 +10,12 @@
           <div v-loading="loading" style="margin-top: 20px;">
             <el-table :data="dataListOne">
               <el-table-column
+                width="50"
+                key="no"
+                type="index"
+                label="No."
+              ></el-table-column>
+              <el-table-column
                 key="Supplier"
                 prop="supplier"
                 label="Supplier"
@@ -48,7 +54,8 @@
               <!-- 添加操作列 -->
               <el-table-column label="Action">
                 <template v-slot="scope">
-                  <el-button type="primary" @click="openDialog(scope.row)">Issue Digipo</el-button>
+                  <el-button v-if="scope.row.status === 'issued'" type="primary" @click="openDialog(scope.row)">Issue Digipo</el-button>
+                  <el-button v-else-if="scope.row.status === 'submit'" type="primary" @click="acceptPayable(scope.row)">Accept Payable</el-button>
                 </template>
               </el-table-column>
             </el-table>
@@ -100,7 +107,7 @@ export default {
         'Acceptance Date':''
       },
       dataListOne:[],
-      curId:''
+      curId:'',
     };
   },
   mounted(){
@@ -113,7 +120,7 @@ export default {
         let { data, error } = await supabase
           .from('dg_asset')
           .select('*')
-          .eq("status","issued")
+          .in("status",["issued","submit"])
         if(!error) {
           this.dataListOne = data
         }  
@@ -121,6 +128,21 @@ export default {
         this.loading = false
       }
            
+    },
+    async acceptPayable(row){
+      try {
+        this.loading = true
+        let { error } = await supabase
+          .from('dg_asset')
+          .update({ status: "confirm" })
+          .eq("id",row.id)
+          if(!error){
+            this.loading = false
+            this.getTableData()
+          }
+      } finally {
+        this.loading = false
+      }
     },
     openDialog(row) {
       this.dialogVisible = true;

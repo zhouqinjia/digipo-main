@@ -17,7 +17,7 @@
       <el-container>
         <el-aside width="220px">
           <el-menu
-            default-active="/home"
+            default-active="/issueDigipo"
             class="el-menu-vertical-demo"
             :router="true"
           >
@@ -27,11 +27,11 @@
             </el-menu-item>
             <el-menu-item index="/home">
               <el-icon><document /></el-icon>
-              <span>Core Home</span>
+              <span>Core</span>
             </el-menu-item>
             <el-menu-item index="/supplierHome">
               <el-icon><document /></el-icon>
-              <span>Supplier Home</span>
+              <span>Supplier</span>
             </el-menu-item>
             <el-menu-item index="/applyDigipoTransfer">
               <el-icon><document /></el-icon>

@@ -76,7 +76,14 @@
           </el-select>
         </el-form-item>
         <el-form-item label="Currency">
-          <el-input v-model="addInvoiceFormData.currency"></el-input>
+          <el-select style="width: 300px"  v-model="addInvoiceFormData.currency" placeholder="Please select">
+            <el-option
+              v-for="item in currencyEnum"
+              :key="item"
+              :label="item"
+              :value="item"
+            ></el-option>
+          </el-select>
         </el-form-item>
         <el-form-item label="Invoice Amount">
           <el-input v-model="addInvoiceFormData.invoice_amount"></el-input>
@@ -113,7 +120,7 @@ const addInvoiceFormData = ref({
 const loading = ref(false)
 const suppliers = ref([])
 const buyers = ref([])
-
+const currencyEnum = ref(['CNY', 'USD', 'JPY', 'GBP', 'EUR', 'AUD', 'CAD', 'NZD', 'SGD', 'CHF', 'MYR', 'THB', 'HKD', 'CNH', 'SEK', 'DKK', 'NOK', 'MXN', 'VND', 'BRL', 'PHP', 'COP', 'CLP', 'TWD', 'IDR', 'PKR', 'BDT', 'AED'])
 const getInvoiceListBySupplierId = async ()=>{
   try {
     if(!route.query.id) return
@@ -121,7 +128,7 @@ const getInvoiceListBySupplierId = async ()=>{
     let { data: dg_invoices, error } = await supabase
       .from('dg_invoice')
       .select('*')
-      .eq("supplier_id",route.query.id)
+      .eq("creator_id",route.query.id)
     if (!error) {
       invoiceList.value = dg_invoices
     }   
@@ -181,7 +188,8 @@ const submitInvoice = async () => {
   try {
     addInvoiceFormData.value.supplier_id = suppliers.value.find(s=>s.value === addInvoiceFormData.value.supplier_name).id || ''
     addInvoiceFormData.value.buyer_id = buyers.value.find(b=>b.value === addInvoiceFormData.value.buyer_name).id || ''
-    let { data: dg_invoices, error } = await supabase
+    addInvoiceFormData.value.creator_id = route.query.id || ''
+    let {  error } = await supabase
     .from('dg_invoice')
     .insert([addInvoiceFormData.value])
     .select()
