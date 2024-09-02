@@ -151,7 +151,7 @@ export default {
           .from('dg_asset')
           .update({status:"acknowledge"})
           .eq("id",row.id)
-          this.btnLoading = false
+        this.btnLoading = false
       }).catch(()=>{})
     },
     changeTab(val){
