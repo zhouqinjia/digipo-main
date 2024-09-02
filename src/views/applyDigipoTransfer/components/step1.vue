@@ -43,7 +43,7 @@
               placeholder="Enter"
             />
           </el-form-item>
-          <el-form-item label="Digipo Recipient" prop="digipo_Recipient">
+          <!-- <el-form-item label="Digipo Recipient" prop="digipo_Recipient">
             <el-select v-model="formData.digipo_Recipient" placeholder="Select">
               <el-option
                 v-for="item in digipoRecipientEnum"
@@ -52,7 +52,7 @@
                 :value="item"
               />
             </el-select>
-          </el-form-item>
+          </el-form-item> -->
           <el-form-item label="Digipo Assignment Purpose">
             <el-input
               v-model="textarea2"
@@ -74,23 +74,19 @@
         <div class="table">
           <div class="grid">
             <div class="label">Digipo Amount:</div>
-            <div class="value amount">1234</div>
+            <div class="value amount">{{ digipoInfo.account_payable_amount }}</div>
           </div>
           <div class="grid">
             <div class="label">Currency</div>
-            <div class="value">1234</div>
+            <div class="value">{{ digipoInfo.currency }}</div>
           </div>
-          <div class="grid">
+          <!-- <div class="grid">
             <div class="label">Digipo Issuer</div>
             <div class="value">1234</div>
-          </div>
+          </div> -->
           <div class="grid">
             <div class="label">Buyer</div>
-            <div class="value">1234</div>
-          </div>
-          <div class="grid">
-            <div class="label">Guarantor</div>
-            <div class="value">1234</div>
+            <div class="value">{{ digipoInfo.buyer }}</div>
           </div>
           <div class="grid">
             <div class="label">Account Receivable No.</div>
@@ -98,15 +94,11 @@
           </div>
           <div class="grid">
             <div class="label">Tier of Digipo Transfer</div>
-            <div class="value">1234</div>
+            <div class="value">{{ digipoInfo.tier_of_digipo_transfer || '-' }}</div>
           </div>
           <div class="grid">
             <div class="label">Days to Maturity</div>
-            <div class="value">1234</div>
-          </div>
-          <div class="grid">
-            <div class="label">Transfer Amount Requested</div>
-            <div class="value amount">1234</div>
+            <div class="value">{{ digipoInfo.account_payable_maturity_date }}</div>
           </div>
         </div>
       </div>
@@ -118,8 +110,10 @@
   </div>
 </template>
 <script setup>
-import { ref } from 'vue'
-import { useRouter } from "vue-router"
+import supabase from '@/utils/supabase.js'
+import { ref,defineEmits } from 'vue'
+import { useRouter,useRoute } from "vue-router"
+const route = useRoute()
 const router = useRouter()
 const formData = ref({
   digipo_Recipient: null
@@ -128,8 +122,9 @@ const rules = ref({
   digipo_Recipient: [{ required: true, message: 'Please Select', trigger: 'blur' }],
 })
 const formDataRef = ref(null)
-const digipoRecipientEnum = ref([])
-const emit = defineEmits(['sendNextStep'])
+// const digipoRecipientEnum = ref([])
+const digipoInfo = ref({})
+const emit = defineEmits(['sendNextStep','setSupplierId'])
 const currencyEnum = ref(['CNY', 'USD', 'JPY', 'GBP', 'EUR', 'AUD', 'CAD', 'NZD', 'SGD', 'CHF', 'MYR', 'THB', 'HKD', 'CNH', 'SEK', 'DKK', 'NOK', 'MXN', 'VND', 'BRL', 'PHP', 'COP', 'CLP', 'TWD', 'IDR', 'PKR', 'BDT', 'AED'])
 const back = () => {
   router.push('/applyDigipoTransfer')
@@ -142,6 +137,15 @@ const next = (formEl) => {
     }
   })
 }
+const getStepOneData = async ()=>{
+  const id = route.query.id
+  const {data,error} = await supabase.from("dg_asset").select("*").eq("id",id)
+  if(!error && data.length){
+    digipoInfo.value = data[0]
+    emit("setSupplierId",digipoInfo.value.supplier_id || '')
+  }
+}
+getStepOneData()
 </script>
 <style lang="sass" scoped>
 .step1 {

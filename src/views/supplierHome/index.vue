@@ -152,7 +152,9 @@ export default {
           .update({status:"acknowledge"})
           .eq("id",row.id)
         this.btnLoading = false
-      }).catch(()=>{})
+      }).catch(()=>{}).finally(()=>{
+        getTableData("assign")
+      })
     },
     changeTab(val){
       if(val){

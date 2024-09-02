@@ -13,8 +13,8 @@
         </el-steps>
       </div>
       <div class="step-area">
-        <step1 v-if="activeStep === 1" @sendNextStep="getStep"/>
-        <step2 v-if="activeStep === 2" @sendNextStep="getStep"/>
+        <step1 v-if="activeStep === 1" @sendNextStep="getStep" @setSupplierId="setSupplierId"/>
+        <step2 v-if="activeStep === 2" @sendNextStep="getStep" :supplierId="curSupplierId"/>
         <step3 v-if="activeStep === 3" @sendNextStep="getStep"/>
         <step4 v-if="activeStep === 4"/>
       </div>
@@ -32,6 +32,10 @@ const router = useRouter()
 const activeStep = ref(1)
 const getStep = (step) => {
   activeStep.value = step
+}
+const curSupplierId = ref('')
+const setSupplierId = (val)=>{
+  curSupplierId.value = val
 }
 </script>
 <style lang="sass" scoped>

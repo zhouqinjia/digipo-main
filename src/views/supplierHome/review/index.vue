@@ -33,7 +33,6 @@
                   {{ file.name || '-' }}
                 </el-button>
               </div>
-              
             </template>
           </el-table-column>
         </el-table>

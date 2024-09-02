@@ -74,27 +74,32 @@
         </div>
       </div>
     </div>
-    <div class="right-pdf">这里是pdf</div>
   </div>
   <div class="footer-3">
     <el-checkbox label="I have read and understood all the contracts above. I agree to sign them." v-model="isCheck"/>
     <div>
-      <el-button plain>Cancel</el-button>
+      <el-button plain @click="goBack">Cancel</el-button>
       <el-button type="primary" @click="next" :disabled="!isCheck">Confirm Signing</el-button>
     </div>
   </div>
 </template>
 <script setup>
+import { useRouter } from "vue-router"
 import { ref } from 'vue';
+const emit = defineEmits(['sendNextStep'])
 const tableList = ref([
   {
     digipo_no: 1234,
     digipo_maturity_date: 2024-8-20,
   },
 ]);
+const router = useRouter()
 const isCheck = ref(false)
 const next = () => {
-  // 调接口 通过跳转下一步
+  emit('sendNextStep', 4)
+}
+const goBack = () => {
+  emit('sendNextStep', 2)
 }
 </script>
 <style lang="scss" scoped>

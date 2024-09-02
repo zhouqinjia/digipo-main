@@ -8,10 +8,10 @@
     <el-table :data="tableData" style="width: 98%; margin-top: 24px;" v-loading="loading">
       <!-- <el-table-column type="selection" width="55" /> -->
       <el-table-column type="index" width="50" label="No."/>
-      <el-table-column width="180" prop="digiop_no" label="Digipo No." />
+      <!-- <el-table-column width="180" prop="digiop_no" label="Digipo No." />
       <el-table-column width="180" prop="account_receivable" label="Account Receivable" />
       <el-table-column width="180" prop="financing_agent" label="Financing Agent" />
-      <el-table-column width="250" prop="tier_of_digipo_transfer" label="Tier of Digipo Transfer" />
+      <el-table-column width="250" prop="tier_of_digipo_transfer" label="Tier of Digipo Transfer" /> -->
       <el-table-column width="180" prop="buyer" label="Buyer" />
       <el-table-column width="180" prop="currency" label="Currency" />
       <el-table-column width="300" prop="account_payable_amount" label="Account Payable Amount" />
@@ -51,13 +51,19 @@ const getTableData = async () => {
   let { data, error } = await supabase
   .from('dg_asset')
   .select('*')
+  .eq("status","acknowledge")
   if(!error) {
     tableData.value = data
     loading.value = false
   }      
 }
-const transfer = () => {
-  vm.$router.push('/transferDetail')
+const transfer = (row) => {
+  vm.$router.push({
+    path:'/transferDetail',
+    query:{
+      id:row.id || ''
+    }
+  })
 }
 getTableData()
 
