@@ -40,6 +40,11 @@
                   </div>
                 </template>
               </el-table-column>
+              <el-table-column
+                key="Status"
+                prop="status"
+                label="Status"
+              ></el-table-column>
               <!-- 添加操作列 -->
               <el-table-column label="Action">
                 <template v-slot="scope">

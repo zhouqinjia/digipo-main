@@ -55,9 +55,13 @@ onMounted(()=>{
   initRouter()
 })
 const initRouter = ()=>{
-  const { path } = route
+  const { path,query,params } = route
   if(path){
-    router.push(path)
+    if(Object.keys(query)){
+      router.push({path,query})
+    }else if(Object.keys(params)){
+      router.push({path,params})
+    }
   }
 }
 

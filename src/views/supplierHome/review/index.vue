@@ -26,13 +26,18 @@
         </el-table>
       </el-main>
     </div>
-    
+    <div class="footer">
+      <el-button type="primary" plain @click="goBack">Cancel</el-button>
+      <el-button type="primary" @click="handleSubmit">Submit</el-button>
+    </div>
   </el-container>
   <el-dialog
     title="Add Invoice"
     v-model="addInvoiceDialogVisible"
     width="40%"
     @close="addInvoiceDialogVisible = false"
+    class="add-invoice-dialog"
+    center
   >
     <div class="form">
       <el-form ref="addInvoiceForm" :model="addInvoiceFormData">
@@ -108,11 +113,7 @@ const addInvoiceFormData = ref({
 const loading = ref(false)
 const suppliers = ref([])
 const buyers = ref([])
-onMounted(async ()=>{
-  getInvoiceListBySupplierId()
-  getBuyerEnum()
-  getSupplierEnum()
-})
+
 const getInvoiceListBySupplierId = async ()=>{
   try {
     if(!route.query.id) return
@@ -128,6 +129,22 @@ const getInvoiceListBySupplierId = async ()=>{
     loading.value = false
   }
    
+}
+const handleSubmit = async ()=>{
+  try {
+    loading.value = true
+    let { data: dg_invoices, error } = await supabase
+      .from("dg_asset")
+      .update({ status: "submit" })
+      .eq("id",route.query.id)
+    if (!error) {
+      goBack()
+    }
+  } finally {
+    loading.value = false
+    goBack()
+  }
+  
 }
 const getBuyerEnum = async () => {
   let { data: dg_buyer, error } = await supabase
@@ -178,16 +195,28 @@ const submitInvoice = async () => {
 function handleAction(row) {
   console.log('Action clicked for row:', row);
 }
+// 页面初始化
+getInvoiceListBySupplierId()
+getBuyerEnum()
+getSupplierEnum()
 </script>
-
+<style lang="scss">
+.add-invoice-dialog {
+  max-width:680px ;
+}
+</style>
 <style lang="scss" scoped>
+
 .header{
   display: flex;
   align-items: center;
   i {
     cursor: pointer;
   }
-  
+}
+.footer{
+  display: flex;
+  justify-content: center;
 }
 .info-header{
   display: flex;
@@ -202,12 +231,12 @@ function handleAction(row) {
 .el-form {
   display: flex;
   flex-wrap: wrap;
+  justify-content: space-between;
   .el-form-item {
     display:flex;
     flex-direction: column;
     align-items:flex-start;
     flex: 0 0 48%;
-    margin-right: 0px;
     :deep(.el-date-editor.el-input) {
       width: 100% !important;
     }
