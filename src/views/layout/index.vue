@@ -15,7 +15,7 @@
         </el-dropdown>
       </el-header>
       <el-container>
-        <el-aside width="200px">
+        <el-aside width="220px">
           <el-menu
             default-active="/home"
             class="el-menu-vertical-demo"
@@ -33,7 +33,11 @@
               <el-icon><document /></el-icon>
               <span>Supplier Home</span>
             </el-menu-item>
-            </el-menu>
+            <el-menu-item index="/applyDigipoTransfer">
+              <el-icon><document /></el-icon>
+              <span>Apply Digipo Transfer</span>
+            </el-menu-item>
+          </el-menu>
         </el-aside>
         <el-main>
           <router-view></router-view>
@@ -99,7 +103,7 @@ const logout = async () => {
     box-shadow: 2px 2px 10px 0 rgba(46,90,153,.1);
   }
   .el-menu {
-    width: 200px;
+    width: 220px;
     background-color: #fff;
     height: 100%;
     border-right: none;
@@ -108,5 +112,6 @@ const logout = async () => {
     margin: 20px;
     background-color: #fff;
     border-radius: 8px;
+    padding-bottom: 0;
   }
 </style>

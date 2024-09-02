@@ -31,7 +31,7 @@
       <el-table-column width="300" prop="underlying_transaction_contract_name" label="Underlying Transaction Contract Name" />
       <el-table-column width="300" prop="underlying_transaction_contract_no" label="Underlying Transaction Contract No." />
       <el-table-column width="300" prop="account_payable_maturity_date" label="Underlying Transaction Date" />
-      <el-table-column fixed="right" label="Operations" min-width="120">
+      <el-table-column fixed="right" label="Action" min-width="120">
         <template #default="scope">
           <el-button
             text
@@ -73,7 +73,6 @@
                   :value="item"
                 />
               </el-select>
-              <!-- <el-input v-model="formData.supplier" placeholder="Enter"/> -->
             </el-form-item>
             <el-form-item label="Buyer" prop="name">
               <el-select
@@ -87,7 +86,6 @@
                   :value="item"
                 />
               </el-select>
-              <!-- <el-input v-model="formData.buyer" /> -->
             </el-form-item>
             <el-form-item label="Payment by Affiliate" prop="resource">
               <el-radio-group v-model="formData.payment_by_affilliate">
@@ -218,6 +216,7 @@ const submitData = async () => {
     supplier: supplierObj.value?.name,
     buyer_id: buyerObj.value?.id,
     buyer: buyerObj.value?.name,
+    status:'issued'
   }])
   if (!err) {
     ElMessage({

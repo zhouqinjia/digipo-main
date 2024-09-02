@@ -29,7 +29,17 @@ const routes = [
         path:'/supplierReview',
         name:'supplierReview',
         component:()=>import("@/views/supplierHome/review/index.vue")
-      }
+      },
+      {
+        path: '/applyDigipoTransfer',
+        name: 'applyDigipoTransfer',
+        component: () => import("../views/applyDigipoTransfer/index.vue"),
+      },
+      {
+        path: '/transferDetail',
+        name: 'transferDetail',
+        component: () => import("../views/applyDigipoTransfer/transferDetail.vue"),
+      },
     ]
   },
 ]
