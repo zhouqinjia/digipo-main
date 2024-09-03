@@ -17,20 +17,13 @@
       <el-table-column width="180" prop="buyer" label="Buyer" />
       <el-table-column width="180" prop="currency" label="Currency" />
       <el-table-column width="300" prop="account_payable_amount" label="Account Payable Amount" />
-      <el-table-column width="300" prop="account_payable_maturity_date" label="Accounts Payable Maturity Date" />
-      <!-- <el-table-column width="180" prop="address" label="Paying Entity" />
-      <el-table-column width="300" prop="address" label="Functional Department" />
-      <el-table-column width="180" prop="address" label="Digipo Status" />
-      <el-table-column width="180" prop="address" label="Financing Agent" />
-      <el-table-column width="180" prop="address" label="Invoice Amount" />
-      <el-table-column width="180" prop="address" label="Acceptance Date" />
-      <el-table-column width="180" prop="address" label="Guarantor" />
-      <el-table-column width="180" prop="address" label="Latest Operator" />
-      <el-table-column width="180" prop="address" label="Creator" />
-      <el-table-column width="180" prop="address" label="Creation Time" /> -->
+      <el-table-column width="300" prop="account_payable_maturity_date" label="Accounts Payable Maturity Date">
+        <template v-slot="{row}">
+          <div>{{row.account_payable_maturity_date.slice(0,10)}}</div>
+        </template>
+      </el-table-column>
       <el-table-column width="300" prop="underlying_transaction_contract_name" label="Underlying Transaction Contract Name" />
       <el-table-column width="300" prop="underlying_transaction_contract_no" label="Underlying Transaction Contract No." />
-      <el-table-column width="300" prop="account_payable_maturity_date" label="Underlying Transaction Date" />
       <el-table-column fixed="right" label="Action" min-width="120">
         <template #default="scope">
           <el-button
