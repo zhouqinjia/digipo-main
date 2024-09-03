@@ -98,7 +98,7 @@
           </div>
           <div class="grid">
             <div class="label">Days to Maturity</div>
-            <div class="value">{{ digipoInfo.account_payable_maturity_date }}</div>
+            <div class="value">{{ digipoInfo.account_payable_maturity_date?.slice(0,10) || '-' }}</div>
           </div>
         </div>
       </div>

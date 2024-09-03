@@ -48,7 +48,13 @@
       </el-table-column>
       <el-table-column width="300" prop="underlying_transaction_contract_name" label="Underlying Transaction Contract Name" />
       <el-table-column width="300" prop="underlying_transaction_contract_no" label="Underlying Transaction Contract No." />
-      <el-table-column width="300" prop="account_payable_maturity_date" label="Underlying Transaction Date" />
+      <el-table-column width="300" prop="account_payable_maturity_date" label="Underlying Transaction Date">
+        <template v-slot="{row}">
+          <div>
+            {{ row.account_payable_maturity_date.slice(0,10) || '-' }}
+          </div>
+        </template>
+      </el-table-column>
       <el-table-column fixed="right" label="Action" min-width="120">
         <template #default="scope">
           <!-- v-if="scope.row.status === 'acknowledge'" -->
