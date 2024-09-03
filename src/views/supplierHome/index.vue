@@ -148,9 +148,8 @@ export default {
           .from('dg_asset')
           .update({status:"acknowledge"})
           .eq("id",row.id)
+        this.getTableData("confirm")
         this.btnLoading = false
-      }).catch(()=>{}).finally(()=>{
-        getTableData("assign")
       })
     },
     changeTab(val){

@@ -195,6 +195,7 @@ const getTableData = async () => {
   let { data, error } = await supabase
   .from('dg_asset')
   .select('*')
+  .eq("status", 'issued')
   if(!error) {
     tableData.value = data
     loading.value = false
