@@ -61,12 +61,12 @@
             </el-table>
           </div>
         </el-tab-pane>
-        <el-tab-pane disabled label="Digipo Settlement" name="digipo-settlement">
+        <!-- <el-tab-pane disabled label="Digipo Settlement" name="digipo-settlement">
 
         </el-tab-pane>
         <el-tab-pane disabled label="Transaction Review" name="transaction-review">
 
-        </el-tab-pane>
+        </el-tab-pane> -->
       </el-tabs>
       <!-- 添加对话框 -->
       <el-dialog

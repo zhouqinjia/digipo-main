@@ -112,9 +112,6 @@
             </el-table-column>
           </el-table>
         </el-tab-pane>
-        <el-tab-pane disabled label="Digipo Issuance" name="digipo-issuance">
-
-        </el-tab-pane>
       </el-tabs>
     </el-main>
   </el-container>
