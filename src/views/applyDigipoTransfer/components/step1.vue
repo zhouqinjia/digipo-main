@@ -21,7 +21,7 @@
         </div>
         <div class="bottom-input">
           <el-form-item label="Currency" prop="region">
-            <el-select v-model="formData.currency" placeholder="Select" disabled>
+            <el-select v-model="digipoInfo.currency" placeholder="Select" disabled>
               <el-option
                 v-for="item in currencyEnum"
                 :key="item"
@@ -32,30 +32,31 @@
           </el-form-item>
           <el-form-item label="Number of Digipo" prop="name">
             <el-input
-              v-model="formData.account_payable_amount"
+              :value="1"
               placeholder="Enter"
               disabled
             />
           </el-form-item>
           <el-form-item label="Transfer Amount Requested" prop="name">
             <el-input
-              v-model="formData.account_payable_amount"
+              v-model="digipoInfo.account_payable_amount"
               placeholder="Enter"
             />
           </el-form-item>
           <el-form-item label="Digipo Recipient" prop="digipo_Recipient">
-            <el-select v-model="formData.digipo_Recipient" placeholder="Select">
+            <el-select v-model="digipoInfo.digipo_Recipient" placeholder="Select">
               <el-option
                 v-for="item in digipoRecipientEnum"
-                :key="item"
-                :label="item"
-                :value="item"
+                :key="item.id"
+                :label="item.name"
+                :value="item.name"
               />
             </el-select>
           </el-form-item>
           <el-form-item label="Digipo Assignment Purpose">
             <el-input
-              v-model="textarea2"
+              disabled
+              value="To transfer CNY 60001 of Digipo in discharge the payment obligation owed by the Assignor to the Assignee pursuant to contract/ invoice dated [Date] in the amount of [Currency] [Amount] (as may be attached to this digipo transfer record), between the assignor and the assignee in relation to [Free text (Optional)]"
               :autosize="{ minRows: 2, maxRows: 6 }"
               type="textarea"
               placeholder="Please input"
@@ -68,8 +69,8 @@
       <div class="title">Digipo Infomation</div>
       <div class="custom-table">
         <div class="top-info">
-          <span>Digipo No. TAS-202408271549</span>
-          <span style="color: #8a9baf">Digipo Maturity Date 2024-09-10</span>
+          <span>Digipo No. {{ digipoInfo.digipo_no }}</span>
+          <span style="color: #8a9baf">Digipo Maturity Date {{ (digipoInfo.account_payable_maturity_date + '').slice(0,10) || '' }}</span>
         </div>
         <div class="table">
           <div class="grid">
@@ -116,13 +117,13 @@ import { useRouter,useRoute } from "vue-router"
 const route = useRoute()
 const router = useRouter()
 const formData = ref({
-  digipo_Recipient: null
+  digipo_Recipient: ''
 })
 const rules = ref({
   // digipo_Recipient: [{ required: true, message: 'Please Select', trigger: 'blur' }],
 })
 const formDataRef = ref(null)
-// const digipoRecipientEnum = ref([])
+const digipoRecipientEnum = ref([])
 const digipoInfo = ref({})
 const emit = defineEmits(['sendNextStep','setSupplierId'])
 const currencyEnum = ref(['CNY', 'USD', 'JPY', 'GBP', 'EUR', 'AUD', 'CAD', 'NZD', 'SGD', 'CHF', 'MYR', 'THB', 'HKD', 'CNH', 'SEK', 'DKK', 'NOK', 'MXN', 'VND', 'BRL', 'PHP', 'COP', 'CLP', 'TWD', 'IDR', 'PKR', 'BDT', 'AED'])
@@ -133,10 +134,26 @@ const next = (formEl) => {
   if (!formEl) return
   formEl.validate(async (valid) => {
     if (valid) {
-      emit('sendNextStep', 2)
+      let { data, error } = await supabase
+        .from('dg_asset')
+        .update({digipo_Recipient:digipoInfo.value.digipo_Recipient || ''})
+        .eq("id",route.query.id)
+      if(!error){
+        emit('sendNextStep', 2)
+      }
     }
   })
 }
+const getSupplierEnum = async () => {
+  
+  let { data: dg_supplier, error } = await supabase
+  .from('dg_supplier')
+  .select('*')
+  if (!error) {
+    digipoRecipientEnum.value = dg_supplier
+  }    
+}
+getSupplierEnum()
 const getStepOneData = async ()=>{
   const id = route.query.id
   const {data,error} = await supabase.from("dg_asset").select("*").eq("id",id)
@@ -147,7 +164,7 @@ const getStepOneData = async ()=>{
 }
 getStepOneData()
 </script>
-<style lang="sass" scoped>
+<style lang="scss" scoped>
 .step1 {
   height: 100%;
   overflow: auto;  

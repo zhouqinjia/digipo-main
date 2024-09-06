@@ -56,27 +56,27 @@
           >
             <el-form-item label="Supplier" prop="name">
               <el-select
-                v-model="supplierObj"
+                v-model="supplierObj.id"
                 placeholder="Select"
               >
                 <el-option
                   v-for="item in supplierEnum"
                   :key="item.id"
                   :label="item.name"
-                  :value="item"
+                  :value="item.id"
                 />
               </el-select>
             </el-form-item>
             <el-form-item label="Buyer" prop="name">
               <el-select
-                v-model="buyerObj"
+                v-model="buyerObj.id"
                 placeholder="Select"
               >
                 <el-option
                   v-for="item in buyerEnum"
                   :key="item.id"
                   :label="item.name"
-                  :value="item"
+                  :value="item.id"
                 />
               </el-select>
             </el-form-item>
@@ -154,8 +154,8 @@ const currencyEnum = ref(['CNY', 'USD', 'JPY', 'GBP', 'EUR', 'AUD', 'CAD', 'NZD'
 const buyerEnum = ref([])
 const supplierEnum = ref([])
 const showModel = ref(false)
-const supplierObj = ref(null)
-const buyerObj = ref(null)
+const supplierObj = ref({ id:'',name:'' })
+const buyerObj = ref({ id:'',name:'' })
 const formData = ref({
   ...origin
 })
@@ -203,6 +203,8 @@ const getTableData = async () => {
           
 }
 const submitData = async () => {
+  supplierObj.value.name = supplierEnum.value.find(s=>s.id === supplierObj.value.id).name || ''
+  buyerObj.value.name = buyerEnum.value.find(b=>b.id === buyerObj.value.id).name || ''
   const { data, err } = await supabase.from('dg_asset').insert([{
     ...formData.value,
     account_payable_amount: formData.value.account_payable_amount*1,
@@ -210,7 +212,9 @@ const submitData = async () => {
     supplier: supplierObj.value?.name,
     buyer_id: buyerObj.value?.id,
     buyer: buyerObj.value?.name,
-    status:'issued'
+    status:'issued',
+    tier_of_digipo_transfer:'1',
+    digipo_no: 'TAS-' + new Date().valueOf()
   }])
   if (!err) {
     ElMessage({
