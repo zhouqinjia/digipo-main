@@ -150,7 +150,7 @@ export default {
           .eq("id",row.id)
         this.getTableData("confirm")
         this.btnLoading = false
-      })
+      }).catch(()=>{})
     },
     changeTab(val){
       if(val){

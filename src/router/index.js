@@ -1,5 +1,6 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
 import layout from '../views/layout/index.vue'
+import { ElMessage } from 'element-plus'
 const routes = [
   {
     path: '/login',
@@ -49,4 +50,20 @@ const router = createRouter({
   routes
 })
 
+router.beforeEach((to, from, next) => {
+  const isLogin = sessionStorage.getItem('isLogin')
+  if (isLogin === 'yes') {
+    next()
+  } else {
+    if (to.path !== '/login') {
+      ElMessage({
+        message: `You haven't logged in yet, please log in first.`,
+        type: 'error'
+      })
+      next('/login')
+    } else {
+      next()
+    }
+  }
+})
 export default router

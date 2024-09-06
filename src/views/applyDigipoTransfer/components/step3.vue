@@ -4,7 +4,7 @@
       <div class="box" v-for="(item, index) in tableList" :key="index">
         <div class="top-info">
           <span class="no">Digipo No. {{ item.digipo_no }}</span>
-          <span class="time">Digipo Maturity Date {{ item.digipo_maturity_date }}</span>
+          <span class="time">Digipo Maturity Date {{ (item.account_payable_maturity_date + '').slice(0,10) || '' }}</span>
         </div>
         <div class="bottom-table">
           <table
@@ -28,7 +28,7 @@
                   >
                 </td>
                 <td>
-                  <span>SGD Supplier 24072204</span>
+                  <span>{{ item.digipo_Recipient || '' }}</span>
                 </td>
               </tr>
               <tr>
@@ -48,7 +48,7 @@
                   >
                 </td>
                 <td>
-                  <span class="info-content">4,000.00</span>
+                  <span class="info-content">{{ item.account_payable_amount || '-' }}</span>
                 </td>
               </tr>
               <tr>
@@ -66,7 +66,7 @@
                   <span class="info-title">Currency </span>
                 </td>
                 <td>
-                  <span class="info-content">USD</span>
+                  <span class="info-content">{{ item.currency }}</span>
                 </td>
               </tr>
             </tbody>
@@ -88,12 +88,7 @@ import { useRouter,useRoute } from "vue-router"
 import { ref } from 'vue';
 import supabase from "@/utils/supabase";
 const emit = defineEmits(['sendNextStep'])
-const tableList = ref([
-  {
-    digipo_no: 1234,
-    digipo_maturity_date: 2024-8-20,
-  },
-]);
+const tableList = ref([]);
 const router = useRouter()
 const route = useRoute()
 const isCheck = ref(false)
@@ -109,6 +104,15 @@ const next = async () => {
 const goBack = () => {
   emit('sendNextStep', 2)
 }
+const getStepOneData = async ()=>{
+  const id = route.query.id
+  const {data,error} = await supabase.from("dg_asset").select("*").eq("id",id)
+  if(!error && data.length){
+    tableList.value = data
+    emit("setSupplierId",tableList.value[0].supplier_id || '')
+  }
+}
+getStepOneData()
 </script>
 <style lang="scss" scoped>
 .step3 {

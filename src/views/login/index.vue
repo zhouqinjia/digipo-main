@@ -22,7 +22,7 @@
         </el-form>
       </div>
       <div class="footer">
-        <el-button type="primary" @click="submitForm(ruleFormRef)">
+        <el-button type="primary" @click="submitForm(ruleFormRef)" :loading="loading">
           Log in
         </el-button>  
       </div>
@@ -48,12 +48,13 @@ const rules = reactive({
   password: [{ required: true, message: 'Please input password',  trigger: 'blur' }],
 })
 
-
+const loading = ref(false)
 const submitForm = (formEl) => {
   if (!formEl) return
   formEl.validate(async (valid) => {
     if (valid) {
       console.log('submit!')
+      loading.value = true
       try {
         // 调用接口进行登录
         const { data, error } = await supabase.auth.signInWithPassword({
@@ -72,7 +73,8 @@ const submitForm = (formEl) => {
             message: 'Login success.',
             type: 'success'
           })
-          vm?.$router.push('/home')
+          sessionStorage.setItem('isLogin', 'yes')
+          vm?.$router.push('/issueDigipo')
         }
       } catch (error) {
         console.log(error)
@@ -80,6 +82,8 @@ const submitForm = (formEl) => {
           message: 'Login false.',
           type: 'error'
         })
+      } finally {
+        loading.value = false
       }
     } else {
       console.log('error submit!')

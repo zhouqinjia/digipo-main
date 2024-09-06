@@ -73,6 +73,7 @@ const vm = getCurrentInstance()?.proxy
 const logout = async () => {
   await supabase.auth.signOut()
   vm.$router.push('/login')
+  sessionStorage.removeItem('isLogin', 'no')
   ElMessage({
     message: 'Logout success.',
     type: 'success'

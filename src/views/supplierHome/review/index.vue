@@ -6,6 +6,45 @@
     </el-header>
     <div v-loading="loading">
       <el-main>
+        <div class="info">
+          <div class="title">Digipo Infomation</div>
+          <div class="custom-table">
+            <div class="top-info">
+              <span>Digipo No. {{ digipoInfo.digipo_no }}</span>
+              <span style="color: #8a9baf">Digipo Maturity Date {{ (digipoInfo.account_payable_maturity_date + '').slice(0,10) || '' }}</span>
+            </div>
+            <div class="table">
+              <div class="grid">
+                <div class="label">Digipo Amount:</div>
+                <div class="value amount">{{ digipoInfo.account_payable_amount }}</div>
+              </div>
+              <div class="grid">
+                <div class="label">Currency</div>
+                <div class="value">{{ digipoInfo.currency }}</div>
+              </div>
+              <!-- <div class="grid">
+                <div class="label">Digipo Issuer</div>
+                <div class="value">1234</div>
+              </div> -->
+              <div class="grid">
+                <div class="label">Buyer</div>
+                <div class="value">{{ digipoInfo.buyer }}</div>
+              </div>
+              <div class="grid">
+                <div class="label">Account Receivable No.</div>
+                <div class="value">1234</div>
+              </div>
+              <div class="grid">
+                <div class="label">Tier of Digipo Transfer</div>
+                <div class="value">{{ digipoInfo.tier_of_digipo_transfer || '-' }}</div>
+              </div>
+              <div class="grid">
+                <div class="label">Days to Maturity</div>
+                <div class="value">{{ digipoInfo.account_payable_maturity_date?.slice(0,10) || '-' }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
         <div class="info-header">
           <h3 class="title">Invoice Information</h3>
           <el-button type="primary" @click="openAddInvoiceDialog">Add Invoice</el-button>
@@ -174,6 +213,17 @@ const suppliers = ref([])
 const buyers = ref([])
 const uploading = ref(false)
 const currencyEnum = ref(['CNY', 'USD', 'JPY', 'GBP', 'EUR', 'AUD', 'CAD', 'NZD', 'SGD', 'CHF', 'MYR', 'THB', 'HKD', 'CNH', 'SEK', 'DKK', 'NOK', 'MXN', 'VND', 'BRL', 'PHP', 'COP', 'CLP', 'TWD', 'IDR', 'PKR', 'BDT', 'AED'])
+const digipoInfo = ref({})
+const emit = defineEmits(['sendNextStep','setSupplierId'])
+const getStepOneData = async ()=>{
+  const id = route.query.id
+  const {data,error} = await supabase.from("dg_asset").select("*").eq("id",id)
+  if(!error && data.length){
+    digipoInfo.value = data[0]
+    emit("setSupplierId",digipoInfo.value.supplier_id || '')
+  }
+}
+getStepOneData()
 const getInvoiceListBySupplierId = async ()=>{
   try {
     if(!route.query.id) return
@@ -374,5 +424,45 @@ getSupplierEnum()
 .file-name{
   cursor: pointer;
 }
-  
+.info {
+  .title {
+    font-weight: 600;
+    font-size: 16px;
+  }
+  .custom-table {
+    background: #f1f5fa;
+    padding: 20px;
+    border-radius: 8px;
+    margin-top: 16px;
+    .top-info {
+      display: flex;
+      justify-content: space-between;
+    }
+    .table {
+      display: flex;
+      flex-wrap: wrap;
+      background-color: #fff;
+      margin-top: 8px;
+      border-top: 1px solid #d7dce4;
+      border-left: 1px solid #d7dce4;
+      .grid {
+        width: 25%;
+        border-right: 1px solid #d7dce4;
+        border-bottom: 1px solid #d7dce4;
+        padding: 12px;
+        box-sizing: border-box;
+      }
+      .label {
+        color: #8a9baf;
+        margin-bottom: 4px;
+      }
+      .amount {
+        color: #333;
+        font-weight: bold;
+      }
+    }
+  }
+}
+
+
 </style>
