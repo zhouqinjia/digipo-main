@@ -69,8 +69,8 @@
       <div class="title">Digipo Infomation</div>
       <div class="custom-table">
         <div class="top-info">
-          <span>Digipo No. {{ digipoInfo.digipo_no }}</span>
-          <span style="color: #8a9baf">Digipo Maturity Date {{ (digipoInfo.account_payable_maturity_date + '').slice(0,10) || '' }}</span>
+          <span>Digipo No. {{ digipoInfo.digipo_no || '-' }}</span>
+          <span style="color: #8a9baf">Digipo Maturity Date {{ (digipoInfo.account_payable_maturity_date + '').slice(0,10) || '-' }}</span>
         </div>
         <div class="table">
           <div class="grid">
