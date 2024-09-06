@@ -55,7 +55,14 @@
     <div class="form">
       <el-form ref="addInvoiceForm" :model="addInvoiceFormData">
         <el-form-item label="Invoice Type">
-          <el-input v-model="addInvoiceFormData.invoice_type"></el-input>
+          <el-select v-model="addInvoiceFormData.invoice_type" style="width:300px">
+            <el-option
+              v-for="item in invoiceTypeOptions"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value"
+            ></el-option>
+          </el-select>
         </el-form-item>
         <el-form-item label="Invoice No">
           <el-input v-model="addInvoiceFormData.invoice_no"></el-input>
@@ -99,7 +106,7 @@
           </el-select>
         </el-form-item>
         <el-form-item label="Invoice Amount">
-          <el-input v-model="addInvoiceFormData.invoice_amount"></el-input>
+          <el-input v-model="addInvoiceFormData.invoice_amount" oninput="value=value.replace(/[^\d\.]/g,'')"></el-input>
         </el-form-item>
       </el-form>
     </div>
@@ -142,6 +149,24 @@ const addInvoiceFormData = ref({
   supplier_id:'',
   buyer_id:''
 })
+const invoiceTypeOptions = [
+  {
+    value: 'Cross-border Invoice',
+    label: 'Cross-border Invoice',
+  },
+  {
+    value: 'Utilities Invoice',
+    label: 'Utilities Invoice',
+  },
+  {
+    value: 'Commercial Invoice',
+    label: 'Commercial Invoice',
+  },
+  {
+    value: 'VAT Invoice',
+    label: 'VAT Invoice',
+  },
+]
 const files = ref([])
 const fileInput = ref(null)
 const loading = ref(false)
